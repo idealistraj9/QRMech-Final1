@@ -1,0 +1,60 @@
+@import 'Dashboard.module.css';
+.root {
+  min-height: calc(100vh);
+}
+.img {
+  border-radius: 5%;
+}
+.title {
+  background-color: #0070f3;
+  padding: 15px;
+  border-radius: 20px;
+}
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: calc(100vh - var(--nav-height));
+  background-color: var(--background);
+}
+.car {
+  background-color: var(--background);
+  color: var(--nav-height);
+  text-align: center;
+}
+.maindiv {
+  background-color: var(--background);
+}
+.modal {
+  background-color: var(--background);
+  height: 500px;
+}
+.popup {
+  background-color: var(--background);
+  color: var(--nav-height);
+  text-align: center;
+  color: red;
+}
+.qr{
+  margin-left: 0%;
+  text-align: center;
+  display: inline;
+  align-items: center;
+  width: 150px;
+}
+.close{
+  margin-left: 0%;
+  text-align: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  left: 100%;
+}
+.content{
+  padding: 10px;
+}
+.mainpage{
+  border: 2px solid #043e81;
+  padding: 25px;
+  border-radius: 10px;
+}
