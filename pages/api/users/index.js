@@ -59,7 +59,7 @@ handler.post(
       carnickname,
       carmodelname,
       carnoplate,
-      credit:'0',
+      credit:0,
     });
     req.logIn(user, (err) => {
       if (err) throw err;

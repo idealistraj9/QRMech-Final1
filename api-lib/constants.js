@@ -8,7 +8,7 @@ export const ValidateProps = {
     carnickname: { type: 'string', minLength: 1, maxLength: 50 },
     carmodelname: { type: 'string', minLength: 1, maxLength: 50 },
     carnoplate: { type: 'string', minLength: 1, maxLength: 50 },
-    credit:{type: 'string', minLength: 1, maxLength: 50},
+    credit:{type: 'integer', minLength: 1, maxLength: 50},
   },
   post: {
     content: { type: 'string', minLength: 1, maxLength: 280 },

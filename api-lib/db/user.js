@@ -62,7 +62,7 @@ export async function insertUser(
     carnickname,
     carmodelname,
     carnoplate,
-    credit='', }
+    credit=0, }
 ) {
   const user = {
     emailVerified: false,

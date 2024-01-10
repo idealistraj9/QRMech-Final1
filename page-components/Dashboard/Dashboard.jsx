@@ -1,33 +1,28 @@
 import { Spacer, Wrapper } from '@/components/Layout';
 import { Button } from '@/components/Button';
-import { ButtonLink } from '@/components/Button/Button';
 import { Input } from '@/components/Input';
-import { TextLink } from '@/components/Text';
-import { fetcher } from '@/lib/fetch';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
-import 'reactjs-popup/dist/index.css';
+import axios from 'axios';
 import styles from './Dashboard.module.css';
 import { useCurrentUser } from '@/lib/user';
 import Popup from 'reactjs-popup';
-import { useAuth } from '../../pages/api/authContext';
 
 const DashboardPage = () => {
-  const { data: { user } = {}, mutate, isValidating } = useCurrentUser();
+  const { data: { user } = {}, isValidating } = useCurrentUser();
   const [cars, setCars] = useState([]);
   const Amount = useRef();
   const [imgURL, setImgURL] = useState('');
+  const [moneyPaid, setmoneyPaid] = useState('');
   const [payment, setPayment] = useState('');
   const [paymentid, setPaymentid] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [msg, setMsg] = useState('');
   const [username, setUsername] = useState('');
-  const { data } = useCurrentUser();
   const router = useRouter();
-  const axios = require('axios');
-  const { isAuthenticated, loading } = useAuth();
+  const [creditUpdated, setCreditUpdated] = useState('');
+  var creditUpdated1 = ''
+
 
   const initiatePayment = async (amt, des) => {
     const paymentData = {
@@ -43,16 +38,15 @@ const DashboardPage = () => {
     try {
       const response = await axios.post('/api/payconiq', paymentData);
       setImgURL(response.data._links.qrcode.href);
-      // console.log('Payment initiated:', response.data);
+      setmoneyPaid(response.data.amount);
       setPaymentid(response.data.paymentId);
-      // console.log(paymentid);
     } catch (error) {
       console.error('Error initiating payment:', error);
     }
   };
 
   const getPaymentDetails = async (paymentId) => {
-    const apiKey = 'fbae8c3f-c2b3-4d44-be7c-37147654ac5c'; // Replace with your actual API key
+    const apiKey = 'fbae8c3f-c2b3-4d44-be7c-37147654ac5c';
     const apiUrl = `/api/paymentDetails?paymentId=${paymentId}`;
 
     try {
@@ -63,81 +57,58 @@ const DashboardPage = () => {
       });
 
       setPayment(response.data.status);
-      // console.log('Payment details:', response.data.status);
-      if (response.data.status === 'SUCCEEDED') {
+      console.log(response.data)
+      if (response.data.status === 'SUCCEEDED' && creditUpdated1 != "updated") {
         setMsg('payment successful!');
-        // toast.success('payment successful!');
+        try {
+          await axios.post('/api/updateCredit', {
+            name: user.username,
+            amount: moneyPaid,
+          });
+          console.log('Credit updated');
+          setCreditUpdated("updated");
+          creditUpdated1 = 'updated';
+          router.reload(); // Set the flag to true after credit update
+          // console.log(creditUpdated);
+        } catch (error) {
+          console.error('Error updating credit:', error.message);
+        }
+
       }
-      return response.data.status; // Return payment details
     } catch (error) {
       console.error('Error fetching payment details:', error);
       throw new Error('Failed to fetch payment details');
     }
+    // console.log("hi")
   };
 
   const handlePayment = async (e) => {
     e.preventDefault();
     const amt = Amount.current.value;
-    const des = '.'; // Access .current.value directly
+    const des = '.';
     try {
-      const response = await initiatePayment(amt, des);
-      setShowModal(true); // Display modal with QR code
+      await initiatePayment(amt, des);
+      setShowModal(true);
     } catch (error) {
       console.error('Error initiating payment:', error);
     }
   };
 
-  //---------------------------
-  const handleMQTTButtonClick = async (e) => {
-    // e.preventDefault();
-    try {
-      const response = await axios.post('/api/mqtt', {
-        message: 'Low credit alert',
-      });
-      if (response.data.success) {
-        // Handle successful MQTT message sent
-        console.log('MQTT message sent successfully');
-      } else {
-        // Handle failure to send MQTT message
-        console.error('Failed to send MQTT message');
-      }
-    } catch (error) {
-      // Handle API call error
-      console.error('Error sending MQTT message:', error);
-    }
-  };
-  //-----------------------------
   useEffect(() => {
-    // Client-side check to avoid triggering during SSR
-    if (!isValidating) {
-      if (!user) {
-        router.replace('/login');
-      } else {
-        router.replace('/dashboard');
-      }
+    if (!isValidating && !user) {
+      router.replace('/login');
     }
-  }, [user, isValidating]);
+  }, [isValidating, user]);
 
   useEffect(() => {
-    if (data && data.user) {
-      setUsername(data.user.username);
+    if (user) {
+      setUsername(user.username);
     }
-  }, [data]);
-  
-  useEffect(() => {
-    fetchAndUpdatePaymentStatus();
-    const interval = setInterval(() => {
-      fetchAndUpdatePaymentStatus();
-    }, 5000);
-    if (paymentid) {
-      getPaymentDetails(paymentid);
-    }
-    return () => clearInterval(interval);
-  }, [paymentid]);
+  }, [user]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (username) {
+    if (username) {
+      const fetchData = async () => {
         try {
           const response = await fetch(
             `/api/fetchUserData?username=${username}`
@@ -151,33 +122,50 @@ const DashboardPage = () => {
         } catch (error) {
           console.error('Error fetching data:', error);
         }
-      }
-    };
-    fetchData();
+      };
+      fetchData();
+    }
   }, [username]);
-  console.log(cars.credit);
-  if (cars.credit < 500) {
-    handleMQTTButtonClick();
-  }
-  const fetchAndUpdatePaymentStatus = async () => {
-    if (paymentid) {
-      try {
-        const status = await getPaymentDetails(paymentid);
-        setPayment(status);
-      } catch (error) {
-        console.error('Error fetching payment details:', error);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (paymentid) {
+        getPaymentDetails(paymentid);
       }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [paymentid]);
+
+  useEffect(() => {
+    if (cars.credit < 500) {
+      handleMQTTButtonClick();
+    }
+  }, [cars.credit]);
+
+  const handleMQTTButtonClick = async () => {
+    try {
+      const response = await axios.post('/api/mqtt', {
+        message: 'Low credit alert',
+      });
+      if (response.data.success) {
+        console.log('MQTT message sent successfully');
+      } else {
+        console.error('Failed to send MQTT message');
+      }
+    } catch (error) {
+      console.error('Error sending MQTT message:', error);
     }
   };
+
   return (
     <>
       <Wrapper className={styles.mainpage}>
         <Spacer size={2} axis="vertical" />
         <div className={styles.carDetails}>
           <img
-            src="/images/bike.png"
+            src="/images/car.png"
             alt=""
-            height={'250px'}
             className={styles.img}
           />
           <h2 className={styles.title}>Car Details</h2>
@@ -198,7 +186,7 @@ const DashboardPage = () => {
           <Input
             type="number"
             // value={handlePayment}
-            onChange={(e) => setPurchaseAmount(parseInt(e.target.value))}
+            onChange={(e) => setmoneyPaid(parseInt(e.target.value))}
             placeholder="Enter Amount"
             ariaLabel="Purchase Amount"
             size="large"
