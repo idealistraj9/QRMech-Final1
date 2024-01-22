@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device QR Code</title>
+    <!-- Include the qrcode library -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+
+    <!-- Display the device-specific QR code -->
+    <div id="qrCode"></div>
+
+    <script>
+        // Function to generate a device-specific URL
+        function generateDeviceUrl(deviceId) {
+            return `http://localhost:3000/login/?deviceID=${deviceId}`;
+        }
+
+        // Function to generate and display the QR code
+        function generateQrCode(deviceId) {
+            const qrCode = new QRCode(document.getElementById('qrCode'));
+            qrCode.makeCode(generateDeviceUrl(deviceId));
+        }
+
+        // Get the device ID from the server or any other source
+        const deviceId = '1234';
+
+        // Generate and display the QR code for the current device
+        generateQrCode(deviceId);
+    </script>
+    <a href="http://localhost:3000/login/?deviceID=${deviceId}">click</a>
+</body>
+</html>
