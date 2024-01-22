@@ -9,6 +9,7 @@ import { useCurrentUser } from '@/lib/user';
 import Popup from 'reactjs-popup';
 
 const DashboardPage = () => {
+  const isWebBrowser = () => typeof window !== 'undefined';
   const { data: { user } = {}, isValidating } = useCurrentUser();
   const [cars, setCars] = useState([]);
   const Amount = useRef();
@@ -103,6 +104,12 @@ const DashboardPage = () => {
       // Step 2: Construct Payconiq universal URL
       let universalUrl = '';
 
+      if (!isWebBrowser()) {
+        window.open(universalUrl, '_blank');
+      } else {
+        setShowModal(true);
+      }
+
       if (isWebBrowser()) {
         // If the user is on a web browser, use the old QR code mechanism
         setImgURL(paymentResponse.data._links.qrcode.href);
@@ -115,11 +122,7 @@ const DashboardPage = () => {
       setPaymentid(paymentResponse.data.paymentId);
 
       // Step 3: Open Payconiq application in a new tab or window
-      if (!isWebBrowser()) {
-        window.open(universalUrl, '_blank');
-      } else {
-        setShowModal(true);
-      }
+      
       // Optionally, you can show the modal after opening Payconiq application
     } catch (error) {
       console.error('Error initiating payment:', error);
