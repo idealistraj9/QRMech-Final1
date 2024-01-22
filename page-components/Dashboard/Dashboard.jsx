@@ -9,7 +9,6 @@ import { useCurrentUser } from '@/lib/user';
 import Popup from 'reactjs-popup';
 
 const DashboardPage = () => {
-  const isWebBrowser = () => typeof window !== 'undefined';
   const { data: { user } = {}, isValidating } = useCurrentUser();
   const [cars, setCars] = useState([]);
   const Amount = useRef();
@@ -23,7 +22,7 @@ const DashboardPage = () => {
   const router = useRouter();
   const [creditUpdated, setCreditUpdated] = useState('');
   var creditUpdated1 = '';
-
+  const isWebBrowser = () => typeof window !== 'undefined';
   // Function to construct Payconiq universal URL for Android
   const constructPayconiqUniversalUrl = (paymentResponseData) => {
     const returnUrl = encodeURIComponent('http://localhost:3000/dashboard'); // Update this URL with your actual web page URL
@@ -82,10 +81,10 @@ const DashboardPage = () => {
   };
 
   // Function to handle payment
+  // Function to handle payment
   const handlePayment = async (e) => {
     e.preventDefault();
     const amt = Amount.current.value;
-    const des = '.';
 
     try {
       // Step 1: Create a Payconiq payment
@@ -102,28 +101,27 @@ const DashboardPage = () => {
       const paymentResponse = await axios.post('/api/payconiq', paymentData);
 
       // Step 2: Construct Payconiq universal URL
-      let universalUrl = '';
+      const universalUrl = constructPayconiqUniversalUrl(paymentResponse.data);
 
-      if (!isWebBrowser()) {
-        window.open(universalUrl, '_blank');
-      } else {
-        setShowModal(true);
-      }
-
+      // Step 3: Open Payconiq application
       if (isWebBrowser()) {
-        // If the user is on a web browser, use the old QR code mechanism
-        setImgURL(paymentResponse.data._links.qrcode.href);
+        // If the user is on a web browser
+        if (navigator.userAgent.match(/Android/i)) {
+          // For Android devices, try to open the Payconiq app
+          window.location.href = universalUrl;
+        } else {
+          // For other devices, show the modal
+          setShowModal(true);
+          setImgURL(paymentResponse.data._links.qrcode.href);
+        }
       } else {
-        // If not, use the new mechanism
-        universalUrl = constructPayconiqUniversalUrl(paymentResponse.data);
+        // If not on a web browser, assume it's a mobile device
+        window.location.href = universalUrl;
       }
 
+      // Set payment-related state variables
       setmoneyPaid(paymentResponse.data.amount);
       setPaymentid(paymentResponse.data.paymentId);
-
-      // Step 3: Open Payconiq application in a new tab or window
-      
-      // Optionally, you can show the modal after opening Payconiq application
     } catch (error) {
       console.error('Error initiating payment:', error);
     }
