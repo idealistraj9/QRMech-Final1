@@ -23,6 +23,7 @@ const DashboardPage = () => {
   const [creditUpdated, setCreditUpdated] = useState('');
   var creditUpdated1 = '';
   const isWebBrowser = () => typeof window !== 'undefined';
+
   // Function to construct Payconiq universal URL for Android
   const constructPayconiqUniversalUrl = (paymentResponseData) => {
     const returnUrl = encodeURIComponent('http://localhost:3000/dashboard'); // Update this URL with your actual web page URL
@@ -81,7 +82,6 @@ const DashboardPage = () => {
   };
 
   // Function to handle payment
-  // Function to handle payment
   const handlePayment = async (e) => {
     e.preventDefault();
     const amt = Amount.current.value;
@@ -109,6 +109,10 @@ const DashboardPage = () => {
         if (navigator.userAgent.match(/Android/i)) {
           // For Android devices, try to open the Payconiq app
           window.location.href = universalUrl;
+        } else if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+          // For iOS devices, attempt to open the Payconiq app
+          window.location.href = universalUrl;
+          // Note: Opening external apps on iOS may require additional user interaction
         } else {
           // For other devices, show the modal
           setShowModal(true);
@@ -281,7 +285,6 @@ const DashboardPage = () => {
           <h2 className={styles.title}>Purchase Credits</h2>
           <Input
             type="number"
-            onChange={(e) => setmoneyPaid(parseInt(e.target.value))}
             placeholder="Enter Amount"
             ariaLabel="Purchase Amount"
             size="large"
