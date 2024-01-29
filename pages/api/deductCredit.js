@@ -5,8 +5,10 @@ export default async function handler(req, res) {
   return new Promise(async (resolve, reject) => {
     try {
       if (req.method === 'POST') {
-        const { name,deduction} = req.body;
-        console.log(`Received POST request to /api/deductCredit for user: ${name}`);
+        const { name, deduction } = req.body;
+        console.log(
+          `Received POST request to /api/deductCredit for user: ${name}`
+        );
         // Connect to MQTT broker with password authentication
         const client = mqtt.connect('mqtt://localhost:1883', {
           username: 'raj', // Replace with your MQTT broker username
@@ -17,8 +19,9 @@ export default async function handler(req, res) {
           // Subscribe to the Update topic
           client.subscribe('Update', (err) => {
             if (err) {
-              res.status(500).json({ error: 'Failed to subscribe to Update topic' });
-              client.end(); // Close MQTT connection
+              res
+                .status(500)
+                .json({ error: 'Failed to subscribe to Update topic' });
               resolve();
             } else {
               console.log('Subscribed to Update topic');
@@ -41,39 +44,43 @@ export default async function handler(req, res) {
               console.log('Received Update:', deviceID, power);
 
               // Calculate credits from power
-              const credits = 0.5 * power;
+              const credits =  power;
 
               // Deduct the credits from the user's credit in the database
-              const user = await db.collection('users').findOne({ username: name });
+              const user = await db
+                .collection('users')
+                .findOne({ username: name });
 
               // Deduct credits only if the user has enough credits
               if (user && user.credit >= credits) {
                 const updatedCredit = user.credit - credits;
 
                 // Update the user's credit in the database
-                const updateResult = await db.collection('users').updateOne(
-                  { username: name },
-                  { $set: { credit: updatedCredit } }
-                );
-              } else {
-                return res.status(403).json({ message: 'Insufficient credits' });
-              }
+                const updateResult = await db
+                  .collection('users')
+                  .updateOne(
+                    { username: name },
+                    { $set: { credit: updatedCredit } }
+                  );
 
-              // Send the power data and calculated credits along with the success response
-              res.status(200).json({ success: true, power, credits });
+                // Send the power data and calculated credits along with the success response
+                res.status(200).json({ success: true, power, credits });
+              } else {
+                return res
+                  .status(403)
+                  .json({ message: 'Insufficient credits' });
+              }
             } catch (error) {
               console.error('Error parsing MQTT message:', error.message);
               res.status(500).json({ error: 'Failed to process MQTT message' });
-            } finally {
-              // Close MQTT connection
-              client.end();
-              resolve();
             }
           }
         });
 
         client.on('error', (err) => {
-          res.status(500).json({ error: 'Failed to connect to MQTT broker:',err });
+          res
+            .status(500)
+            .json({ error: 'Failed to connect to MQTT broker:', err });
           resolve();
         });
       } else {
@@ -82,7 +89,7 @@ export default async function handler(req, res) {
       }
     } catch (error) {
       console.error('Error:', error.message);
-      res.status(500).json({ error: 'Internal Server Error',error });
+      res.status(500).json({ error: 'Internal Server Error', error });
       resolve();
     }
   });
