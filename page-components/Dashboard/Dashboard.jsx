@@ -23,6 +23,10 @@ const DashboardPage = () => {
   const [creditUpdated, setCreditUpdated] = useState('');
   var creditUpdated1 = '';
   const isWebBrowser = () => typeof window !== 'undefined';
+  const [power, setPower] = useState(null);
+  const [fetchPower, setFetchPower] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [lastFetchedPower, setLastFetchedPower] = useState(null);
 
   // Function to construct Payconiq universal URL for Android
   const constructPayconiqUniversalUrl = (paymentResponseData) => {
@@ -216,6 +220,34 @@ const DashboardPage = () => {
 
       if (response.data.success) {
         console.log(`${command} command sent successfully`);
+
+        if (command === 'start') {
+          // If the command is 'start', enable power data fetching and record start time
+          setFetchPower(true);
+        } else if (command === 'stop') {
+          // If the command is 'stop', disable power data fetching
+          setFetchPower(false);
+
+          // Calculate final deduction based on last fetched power
+          if (lastFetchedPower !== null) {
+
+            try {
+              // Deduct the calculated value from the user's credit
+              await axios.post('/api/deductCredit', {
+                name: user.username,
+                
+              });
+              // Reset start time and last fetched power
+              setStartTime(null);
+              setLastFetchedPower(null);
+
+              // Reload the page or perform any other necessary actions
+              router.reload();
+            } catch (error) {
+              console.error('Error deducting credit:', error.message);
+            }
+          }
+        }
       } else {
         console.error(`Failed to send ${command} command`);
       }
@@ -224,23 +256,41 @@ const DashboardPage = () => {
     }
   };
 
-  // Helper function to send stop command
-  const sendStopCommand = async (deviceID) => {
-    try {
-      const response = await axios.post('/api/mqtt', {
-        deviceID: deviceID,
-        Command: 'stop',
-      });
+  //-------------------------------
+  // Fetch latest power data every 2 minutes when fetchPower is true
+  useEffect(() => {
+    const fetchLatestPower = async () => {
+      try {
+        // Make a POST request to your updateCredit API
+        const response = await axios.post('/api/deductCredit', {
+          name: user.username,
+          amount: 0,
+        });
 
-      if (response.data.success) {
-        console.log('Stop command sent successfully');
-      } else {
-        console.error('Failed to send stop command');
+        console.log(response.data);
+        // Extract power from the response
+        const latestPower = response.data.power;
+
+        // Update the state with the latest power
+        setPower(latestPower);
+      } catch (error) {
+        console.error('Error fetching latest power data:', error.message);
       }
-    } catch (error) {
-      console.error('Error sending stop command:', error.message);
+    };
+
+    if (fetchPower) {
+      // Fetch latest power data immediately when fetchPower is true
+      fetchLatestPower();
+
+      // Set up an interval to fetch latest power data every 2 minutes
+      const intervalId = setInterval(() => {
+        fetchLatestPower();
+      }, 1000); // 2 minutes in milliseconds
+
+      // Clean up the interval when the component is unmounted or fetchPower is false
+      return () => clearInterval(intervalId);
     }
-  };
+  }, [fetchPower]);
 
   return (
     <>
@@ -249,7 +299,7 @@ const DashboardPage = () => {
         {/* Car Details Section */}
         <div className={styles.carDetails}>
           <img src="/images/car.png" alt="" className={styles.img} />
-
+          <p>Latest Power: {power !== null ? `${power} kWh` : '0'}</p>
           <h2 className={styles.title}>Car Details</h2>
           <p>Car name: {cars.carnickname}</p>
           <p>Car Model: {cars.carmodelname}</p>
@@ -259,7 +309,9 @@ const DashboardPage = () => {
         {/* Credit Balance Section */}
         <div className={styles.creditBalance}>
           <h2 className={styles.title}>Credit Balance</h2>
-          <p style={{ fontSize: '24px' }}>{cars.credit} credits</p>
+          <p style={{ fontSize: '24px' }}>
+            {cars.credit} credits (kWh = Credit)
+          </p>
           <Button
             type="button"
             onClick={() => handleMQTTButtonClick('start')}
