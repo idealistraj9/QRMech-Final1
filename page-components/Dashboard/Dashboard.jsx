@@ -222,27 +222,21 @@ const DashboardPage = () => {
         console.log(`${command} command sent successfully`);
 
         if (command === 'start') {
-          // If the command is 'start', enable power data fetching and record start time
           setFetchPower(true);
         } else if (command === 'stop') {
-          // If the command is 'stop', disable power data fetching
           setFetchPower(false);
-
-          // Calculate final deduction based on last fetched power
-          if (lastFetchedPower !== null) {
-
+          if (power !== null) {
             try {
               // Deduct the calculated value from the user's credit
               await axios.post('/api/deductCredit', {
                 name: user.username,
-                
               });
               // Reset start time and last fetched power
               setStartTime(null);
-              setLastFetchedPower(null);
+              setPower(null);
 
               // Reload the page or perform any other necessary actions
-              router.reload();
+              // router.reload();
             } catch (error) {
               console.error('Error deducting credit:', error.message);
             }
@@ -257,37 +251,34 @@ const DashboardPage = () => {
   };
 
   //-------------------------------
+  const fetchLatestPower = async () => {
+    try {
+      // Make a POST request to your updateCredit API
+      const response = await axios.post('/api/deductCredit', {
+        name: user.username,
+        amount: 0,
+      });
+      console.log(response.data);
+      // Extract power from the response
+      const latestPower = response.data.power;
+      // Update the state with the latest power
+      setPower(latestPower);
+    } catch (error) {
+      console.error('Error fetching latest power data:', error.message);
+    }
+  };
   // Fetch latest power data every 2 minutes when fetchPower is true
   useEffect(() => {
-    const fetchLatestPower = async () => {
-      try {
-        // Make a POST request to your updateCredit API
-        const response = await axios.post('/api/deductCredit', {
-          name: user.username,
-          amount: 0,
-        });
-
-        console.log(response.data);
-        // Extract power from the response
-        const latestPower = response.data.power;
-
-        // Update the state with the latest power
-        setPower(latestPower);
-      } catch (error) {
-        console.error('Error fetching latest power data:', error.message);
-      }
-    };
-
     if (fetchPower) {
-      // Fetch latest power data immediately when fetchPower is true
       fetchLatestPower();
 
       // Set up an interval to fetch latest power data every 2 minutes
       const intervalId = setInterval(() => {
         fetchLatestPower();
-      }, 1000); // 2 minutes in milliseconds
+      }, 120000); // 2 minutes in milliseconds
 
-      // Clean up the interval when the component is unmounted or fetchPower is false
+      // Clean up the interval when the component is unmounted or charging is stopped
+      console.log('hi');
       return () => clearInterval(intervalId);
     }
   }, [fetchPower]);
