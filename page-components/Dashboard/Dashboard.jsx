@@ -275,7 +275,7 @@ const DashboardPage = () => {
       // Set up an interval to fetch latest power data every 2 minutes
       const intervalId = setInterval(() => {
         fetchLatestPower();
-      }, 120000); // 2 minutes in milliseconds
+      }, 5000); // 2 minutes in milliseconds
 
       // Clean up the interval when the component is unmounted or charging is stopped
       console.log('hi');
