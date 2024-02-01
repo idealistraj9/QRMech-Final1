@@ -16,9 +16,9 @@ const SignUp = () => {
   const passwordRef = useRef();
   const usernameRef = useRef();
   const nameRef = useRef();
-  const carnicknameref = useRef();
-  const carmodelnameref = useRef();
-  const carnoplateref = useRef();
+  const Ebikenicknameref = useRef();
+  const Ebikemodelnameref = useRef();
+  const Ebikenoplateref = useRef();
 
   const { data ,mutate } = useCurrentUser();
   console.log(data);
@@ -39,9 +39,9 @@ const SignUp = () => {
             password: passwordRef.current.value,
             username: usernameRef.current.value,
             name: nameRef.current.value,
-            carnickname: carnicknameref.current.value,
-            carmodelname: carmodelnameref.current.value,
-            carnoplate: carnoplateref.current.value,
+            Ebikenickname: Ebikenicknameref.current.value,
+            Ebikemodelname: Ebikemodelnameref.current.value,
+            Ebikenoplate: Ebikenoplateref.current.value,
           }),
         });
         mutate({ user: response.user }, false);
@@ -109,32 +109,32 @@ const SignUp = () => {
           />
           <Spacer size={1} axis="vertical" />
           <Container alignItems="center">
-            <p className={styles.subtitle}>car details</p>
+            <p className={styles.subtitle}>Ebike details</p>
             <div className={styles.seperator} />
           </Container>
           <Input
-            ref={carnicknameref}
-            autoComplete="carnickname"
-            placeholder="carnickname"
-            ariaLabel="carnickname"
+            ref={Ebikenicknameref}
+            autoComplete="Ebikenickname"
+            placeholder="Ebikenickname"
+            ariaLabel="Ebikenickname"
             size="large"
             required
           />
           <Spacer size={0.5} axis="vertical" />
           <Input
-            ref={carmodelnameref}
-            autoComplete="carmodelname"
-            placeholder="carmodelname"
-            ariaLabel="carmodelname"
+            ref={Ebikemodelnameref}
+            autoComplete="Ebikemodelname"
+            placeholder="Ebikemodelname"
+            ariaLabel="Ebikemodelname"
             size="large"
             required
           />
           <Spacer size={0.5} axis="vertical" />
           <Input
-            ref={carnoplateref}
-            autoComplete="carnoplate"
-            placeholder="carnoplate"
-            ariaLabel="carnoplate"
+            ref={Ebikenoplateref}
+            autoComplete="Ebikenoplate"
+            placeholder="Ebikenoplate"
+            ariaLabel="Ebikenoplate"
             size="large"
             required
           />

@@ -18,18 +18,18 @@ handler.post(
       name: ValidateProps.user.name,
       password: ValidateProps.user.password,
       email: ValidateProps.user.email,
-      carnickname: ValidateProps.user.carnickname,
-      carmodelname: ValidateProps.user.carmodelname,
-      carnoplate: ValidateProps.user.carnoplate,
+      Ebikenickname: ValidateProps.user.Ebikenickname,
+      Ebikemodelname: ValidateProps.user.Ebikemodelname,
+      Ebikenoplate: ValidateProps.user.Ebikenoplate,
     },
-    required: ['username', 'name', 'password', 'email','carnickname','carmodelname','carnoplate'],
+    required: ['username', 'name', 'password', 'email','Ebikenickname','Ebikemodelname','Ebikenoplate'],
     additionalProperties: false,
   }),
   ...auths,
   async (req, res) => {
     const db = await getMongoDb();
 
-    let { username, name, email, password ,carnickname ,carmodelname , carnoplate } = req.body;
+    let { username, name, email, password ,Ebikenickname ,Ebikemodelname , Ebikenoplate } = req.body;
     username = slugUsername(req.body.username);
     email = normalizeEmail(req.body.email);
     if (!isEmail(email)) {
@@ -56,9 +56,9 @@ handler.post(
       bio: '',
       name,
       username,
-      carnickname,
-      carmodelname,
-      carnoplate,
+      Ebikenickname,
+      Ebikemodelname,
+      Ebikenoplate,
       credit:0,
     });
     req.logIn(user, (err) => {

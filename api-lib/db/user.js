@@ -59,9 +59,9 @@ export async function insertUser(
     name,
     profilePicture,
     username,
-    carnickname,
-    carmodelname,
-    carnoplate,
+    Ebikenickname,
+    Ebikemodelname,
+    Ebikenoplate,
     credit=0, }
 ) {
   const user = {
@@ -71,9 +71,9 @@ export async function insertUser(
     name,
     username,
     bio,
-    carnickname,
-    carmodelname,
-    carnoplate,
+    Ebikenickname,
+    Ebikemodelname,
+    Ebikenoplate,
     credit,
   };
   const password = await bcrypt.hash(originalPassword, 10);

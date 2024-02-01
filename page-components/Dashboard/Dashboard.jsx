@@ -10,7 +10,7 @@ import Popup from 'reactjs-popup';
 
 const DashboardPage = () => {
   const { data: { user } = {}, isValidating } = useCurrentUser();
-  const [cars, setCars] = useState([]);
+  const [Ebikes, setEbikes] = useState([]);
   const Amount = useRef();
   const [imgURL, setImgURL] = useState('');
   const [moneyPaid, setmoneyPaid] = useState('');
@@ -172,7 +172,7 @@ const DashboardPage = () => {
           );
           if (response.ok) {
             const userData = await response.json();
-            setCars(userData);
+            setEbikes(userData);
           } else {
             throw new Error('Failed to fetch data');
           }
@@ -194,11 +194,10 @@ const DashboardPage = () => {
     return () => clearInterval(interval);
   }, [paymentid]);
 
-  // Function to handle MQTT button click
-  const handleMQTTButtonClick = async (command) => {
+  const sendStopCommand = async (command) => {
     try {
       const deviceID = sessionStorage.getItem('deviceID');
-      const userCredits = cars.credit;
+      const userCredits = Ebikes.credit;
 
       if (!deviceID) {
         console.error('Device ID not found in sessionStorage');
@@ -209,6 +208,31 @@ const DashboardPage = () => {
       if (userCredits === 0 && command === 'start') {
         console.log('Zero credits. Sending stop command.');
         await sendStopCommand(deviceID);
+        return;
+      }
+
+      // Send the command via MQTT
+      const response = await axios.post('/api/mqtt', {
+        deviceID: deviceID,
+        Command: command,
+      });
+    } catch (error) {}
+  };
+  // Function to handle MQTT button click
+  const handleMQTTButtonClick = async (command) => {
+    try {
+      const deviceID = sessionStorage.getItem('deviceID');
+      const userCredits = Ebikes.credit;
+
+      if (!deviceID) {
+        console.error('Device ID not found in sessionStorage');
+        return;
+      }
+
+      // Check if credits are zero and send stop command
+      if (userCredits === 0 && command === 'start') {
+        console.log('Zero credits. Sending stop command.');
+        await sendStopCommand('stop');
         return;
       }
 
@@ -287,21 +311,21 @@ const DashboardPage = () => {
     <>
       <Wrapper className={styles.mainpage}>
         <Spacer size={2} axis="vertical" />
-        {/* Car Details Section */}
-        <div className={styles.carDetails}>
+        {/* Ebike Details Section */}
+        <div className={styles.EbikeDetails}>
           <img src="/images/car.png" alt="" className={styles.img} />
           <p>Latest Power: {power !== null ? `${power} kWh` : '0'}</p>
-          <h2 className={styles.title}>Car Details</h2>
-          <p>Car name: {cars.carnickname}</p>
-          <p>Car Model: {cars.carmodelname}</p>
-          <p>License Plate: {cars.carnoplate}</p>
+          <h2 className={styles.title}>Ebike Details</h2>
+          <p>Ebike name: {Ebikes.Ebikenickname}</p>
+          <p>Ebike Model: {Ebikes.Ebikemodelname}</p>
+          <p>License Plate: {Ebikes.Ebikenoplate}</p>
         </div>
 
         {/* Credit Balance Section */}
         <div className={styles.creditBalance}>
           <h2 className={styles.title}>Credit Balance</h2>
           <p style={{ fontSize: '24px' }}>
-            {cars.credit} credits (kWh = Credit)
+            {Ebikes.credit} credits (kWh = Credit)
           </p>
           <Button
             type="button"

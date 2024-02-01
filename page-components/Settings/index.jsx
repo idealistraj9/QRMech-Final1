@@ -76,7 +76,7 @@ const Auth = () => {
   }, []);
 
   return (
-    <section className={styles.card}>
+    <section className={styles.Ebiked}>
       <h4 className={styles.sectionTitle}>Password</h4>
       <form onSubmit={onSubmit}>
         <Input
@@ -161,7 +161,7 @@ const AboutYou = ({ user, mutate }) => {
   }, [user]);
 
   return (
-    <section className={styles.card}>
+    <section className={styles.Ebiked}>
       <h4 className={styles.sectionTitle}>About You</h4>
       <form onSubmit={onSubmit}>
         <Input ref={usernameRef} label="Your Username" />
