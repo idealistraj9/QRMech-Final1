@@ -62,7 +62,8 @@ export async function insertUser(
     Ebikenickname,
     Ebikemodelname,
     Ebikenoplate,
-    credit=0, }
+    credit=0,
+    role='user', }
 ) {
   const user = {
     emailVerified: false,
@@ -75,6 +76,7 @@ export async function insertUser(
     Ebikemodelname,
     Ebikenoplate,
     credit,
+    role,
   };
   const password = await bcrypt.hash(originalPassword, 10);
   const { insertedId } = await db

@@ -14,17 +14,26 @@ import styles from './Auth.module.css';
 // import Cookies from 'js-cookie';
 
 const Login = () => {
+  const router = useRouter();
+  const data = router.query;
   const emailRef = useRef();
   const passwordRef = useRef();
-
+  console.log(data);
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: { user } = {}, mutate, isValidating } = useCurrentUser();
-  const router = useRouter();
+  const isAuthenticated = user !== undefined && user !== null;
+
   useEffect(() => {
-    if (isValidating) return;
-    if (user) router.replace('/dashboard');
-  }, [user, router, isValidating]);
+    if (isAuthenticated) {
+      // If the user is logged in, redirect them based on their role
+      if (user.role === 'admin') {
+        router.replace('/admin');
+      } else {
+        router.replace('/dashboard');
+      }
+    }
+  }, [isAuthenticated, user, router]);
 
   const onSubmit = useCallback(
     async (event) => {
@@ -39,15 +48,24 @@ const Login = () => {
             password: passwordRef.current.value,
           }),
         });
-        mutate({ user: response.user }, false);
-        toast.success('You have been logged in.');
+
+        // Check if the user is an admin
+        if (response.user.role === 'admin') {
+          // Redirect the admin user to the admin page
+          router.replace('/admin');
+        } else {
+          // If not an admin, proceed with normal redirect
+          mutate({ user: response.user }, false);
+          router.replace('/dashboard');
+          toast.success('You have been logged in.');
+        }
       } catch (e) {
         toast.error('Incorrect email or password.');
       } finally {
         setIsLoading(false);
       }
     },
-    [mutate]
+    [mutate, router]
   );
 
   return (

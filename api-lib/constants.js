@@ -9,11 +9,7 @@ export const ValidateProps = {
     Ebikemodelname: { type: 'string', minLength: 1, maxLength: 50 },
     Ebikenoplate: { type: 'string', minLength: 1, maxLength: 50 },
     credit:{type: 'integer', minLength: 1, maxLength: 50},
+    role:{type: 'string', minLength: 1, maxLength: 50},
   },
-  post: {
-    content: { type: 'string', minLength: 1, maxLength: 280 },
-  },
-  comment: {
-    content: { type: 'string', minLength: 1, maxLength: 280 },
-  },
+  
 };

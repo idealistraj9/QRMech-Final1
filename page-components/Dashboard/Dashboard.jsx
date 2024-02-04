@@ -27,6 +27,7 @@ const DashboardPage = () => {
   const [fetchPower, setFetchPower] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [lastFetchedPower, setLastFetchedPower] = useState(null);
+  const [deviceID, setDeviceID] = useState();
 
   // Function to construct Payconiq universal URL for Android
   const constructPayconiqUniversalUrl = (paymentResponseData) => {
@@ -81,7 +82,10 @@ const DashboardPage = () => {
       }
     } catch (error) {
       console.error('Error fetching payment details:', error);
-      throw new Error('Failed to fetch payment details');
+      // Handle the error gracefully
+      // You can choose to log the error, set an error state, or perform other actions as needed
+      // For example, set an error state to display an error message on the UI
+      // setErrorState('Failed to fetch payment details');
     }
   };
 
@@ -158,12 +162,6 @@ const DashboardPage = () => {
   }, [isValidating, user]);
 
   useEffect(() => {
-    if (user) {
-      setUsername(user.username);
-    }
-  }, [user]);
-
-  useEffect(() => {
     if (username) {
       const fetchData = async () => {
         try {
@@ -198,10 +196,12 @@ const DashboardPage = () => {
     try {
       const deviceID = sessionStorage.getItem('deviceID');
       const userCredits = Ebikes.credit;
-
+      setDeviceID(deviceID);
       if (!deviceID) {
         console.error('Device ID not found in sessionStorage');
         return;
+      } else {
+        console.log(deviceID);
       }
 
       // Check if credits are zero and send stop command
@@ -218,6 +218,11 @@ const DashboardPage = () => {
       });
     } catch (error) {}
   };
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username);
+    }
+  }, [user]);
   // Function to handle MQTT button click
   const handleMQTTButtonClick = async (command) => {
     try {

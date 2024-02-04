@@ -42,6 +42,7 @@ const SignUp = () => {
             Ebikenickname: Ebikenicknameref.current.value,
             Ebikemodelname: Ebikemodelnameref.current.value,
             Ebikenoplate: Ebikenoplateref.current.value,
+            role: 'user',
           }),
         });
         mutate({ user: response.user }, false);
