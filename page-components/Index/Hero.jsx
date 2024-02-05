@@ -50,13 +50,13 @@ const Hero = () => {
     try {
       // Step 1: Create a Payconiq payment
       const paymentData = {
-        merchantId: 'YOUR_MERCHANT_ID',
-        paymentProfileId: 'YOUR_PAYMENT_PROFILE_ID',
+        merchantId: '5e99a4841dffb500067c6d62',
+        paymentProfileId: '5e99a48d1dffb500067c6d63',
         amount: amount,
         currency: 'EUR',
         reference: 'Test payment',
         description: '',
-        callbackUrl: 'https://www.yourcallbackurl.com/payconiq/payment',
+        callbackUrl: 'https://www.testcallback.com/payconiq/payment',
       };
 
       const paymentResponse = await axios.post('/api/payconiq', paymentData);
