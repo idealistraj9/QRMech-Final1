@@ -28,7 +28,7 @@ const Hero = () => {
 
     if (params.deviceID) {
       // Set deviceID in session
-      axiosSession.post('/api/setDeviceID', { deviceID: params.deviceID });
+      // axiosSession.post('/api/setDeviceID', { deviceID: params.deviceID });
       setDeviceID(params.deviceID);
       sessionStorage.setItem('deviceID', params.deviceID);
       // Set deviceID as a default header for all Axios requests
