@@ -55,8 +55,8 @@ const Login = () => {
           router.replace('/admin');
         } else {
           // If not an admin, proceed with normal redirect
+          // router.replace('/dashboard');
           mutate({ user: response.user }, false);
-          router.replace('/dashboard');
           toast.success('You have been logged in.');
         }
       } catch (e) {

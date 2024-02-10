@@ -7,8 +7,7 @@ export default async function handler(req, res) {
 
   if (method === 'GET') {
     const { paymentId } = req.query;
-    // console.log(paymentId);
-    // console.log("hi");
+
     try {
       const response = await axios.get(
         `https://api.ext.payconiq.com/v3/payments/${paymentId}`,

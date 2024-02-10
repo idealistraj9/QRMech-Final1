@@ -16,7 +16,7 @@ export default async function handler(req, res) {
           'Access-Control-Allow-Origin': '*',
         },
       });
-
+      // console.log('response', response);
       res.status(response.status).json(response.data);
     } catch (error) {
       console.error('Error initiating payment:', error);

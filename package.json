@@ -4,7 +4,7 @@
   "description": "Full fledged app made with Next.JS and MongoDB",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 80",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

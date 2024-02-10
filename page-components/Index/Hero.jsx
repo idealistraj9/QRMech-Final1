@@ -30,8 +30,10 @@ const Hero = () => {
       // Set deviceID in session
       axiosSession.post('/api/setDeviceID', { deviceID: params.deviceID });
       setDeviceID(params.deviceID);
+      sessionStorage.setItem('deviceID', params.deviceID);
       // Set deviceID as a default header for all Axios requests
       axiosSession.defaults.headers.common['Device-ID'] = params.deviceID;
+      console.log(params.deviceID)
     }
   }, [setDeviceID]);
 
@@ -50,13 +52,13 @@ const Hero = () => {
     try {
       // Step 1: Create a Payconiq payment
       const paymentData = {
-        merchantId: '5e99a4841dffb500067c6d62',
-        paymentProfileId: '5e99a48d1dffb500067c6d63',
+        merchantId: PAYCONIQ_MERCHANT_ID,
+        paymentProfileId: PAYCONIQ_PROFILE_ID,
         amount: amount,
         currency: 'EUR',
         reference: 'Test payment',
         description: '',
-        callbackUrl: 'https://www.testcallback.com/payconiq/payment',
+        callbackUrl: 'https://3ec6-2409-40c1-1011-8023-fdfd-5892-9ade-7317.ngrok-free.app',
       };
 
       const paymentResponse = await axios.post('/api/payconiq', paymentData);

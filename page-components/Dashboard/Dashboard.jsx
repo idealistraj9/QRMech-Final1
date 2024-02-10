@@ -27,6 +27,8 @@ const DashboardPage = () => {
   const [fetchPower, setFetchPower] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [lastFetchedPower, setLastFetchedPower] = useState(null);
+  const [powerToDebited, setPowerToDebited] = useState(null);
+  const [prevDebitedPower, setPrevDebitedPower] = useState(null);
   const [deviceID, setDeviceID] = useState();
 
   // Function to construct Payconiq universal URL for Android
@@ -254,22 +256,6 @@ const DashboardPage = () => {
           setFetchPower(true);
         } else if (command === 'stop') {
           setFetchPower(false);
-          if (power !== null) {
-            try {
-              // Deduct the calculated value from the user's credit
-              await axios.post('/api/deductCredit', {
-                name: user.username,
-              });
-              // Reset start time and last fetched power
-              setStartTime(null);
-              setPower(null);
-
-              // Reload the page or perform any other necessary actions
-              // router.reload();
-            } catch (error) {
-              console.error('Error deducting credit:', error.message);
-            }
-          }
         }
       } else {
         console.error(`Failed to send ${command} command`);
@@ -282,20 +268,34 @@ const DashboardPage = () => {
   //-------------------------------
   const fetchLatestPower = async () => {
     try {
-      // Make a POST request to your updateCredit API
+      // Make a POST request to your fetchPowerData API
       const response = await axios.post('/api/deductCredit', {
         name: user.username,
-        amount: 0,
       });
       console.log(response.data);
       // Extract power from the response
-      const latestPower = response.data.power;
+
+      console.log(powerToDebited);
+      console.log(response.data.power);
+      setPowerToDebited(response.data.power);
+      console.log(powerToDebited);
+      deduct();
       // Update the state with the latest power
-      setPower(latestPower);
     } catch (error) {
       console.error('Error fetching latest power data:', error.message);
     }
   };
+
+  // Deduct credits only if there is a positive difference
+  const deduct = async () => {
+    const deductResponse = await axios.post('/api/deductCredit', {
+      name: user.username,
+      deduction: powerToDebited,
+    });
+
+    console.log(`Deducted ${powerToDebited} credits successfully`);
+  };
+
   // Fetch latest power data every 2 minutes when fetchPower is true
   useEffect(() => {
     if (fetchPower) {
