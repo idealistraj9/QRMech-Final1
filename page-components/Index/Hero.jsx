@@ -52,8 +52,8 @@ const Hero = () => {
     try {
       // Step 1: Create a Payconiq payment
       const paymentData = {
-        merchantId: PAYCONIQ_MERCHANT_ID,
-        paymentProfileId: PAYCONIQ_PROFILE_ID,
+        merchantId: process.env.PAYCONIQ_MERCHANT_ID,
+        paymentProfileId: process.env.PAYCONIQ_PROFILE_ID,
         amount: amount,
         currency: 'EUR',
         reference: 'Test payment',
